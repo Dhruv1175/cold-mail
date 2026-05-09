@@ -1,0 +1,29 @@
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum LeadStatus{
+  DISCOVERED
+  RESEARCHED
+  DRAFTED
+  FAILED
+}
+
+
+model Lead {
+  id               String @id @default(cuid())
+  createdAt        DateTime @default(now()) 
+  companyName      String 
+  website          String
+  prospectName     String
+  title            String
+  signal           String
+  emailDraft       String?
+  status           LeadStatus @default(DISCOVERED)
+  deliverability   Json?
+}
