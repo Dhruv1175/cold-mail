@@ -24,29 +24,32 @@ export default async function Home() {
       <div className="overflow-x-auto">
         <table className="w-full text-left border-collapse">
           <thead>
-            <tr className="border-b">
-              <th className="p-2">Company</th>
-              <th className="p-2">Status</th>
-              <th className="p-2">Health (SPF/DMARC)</th>
-            </tr>
-          </thead>
-          <tbody>
-            {leads.map((lead) => (
-              <tr key={lead.id} className="border-b border-black">
-                <td className="p-2 font-medium ">{lead.companyName}</td>
-                <td className="p-2 text-sm">{lead.status}</td>
-                <td className="p-2">
-                  {/* Proof of DNS knowledge */}
-                  {lead.deliverability && typeof lead.deliverability === 'object' ? (
-                    <div className="flex gap-2">
-                      <span className={(lead.deliverability as any).hasSPF ? "text-green-600" : "text-red-600"}>SPF</span>
-                      <span className={(lead.deliverability as any).hasDMARC ? "text-green-600" : "text-red-600"}>DMARC</span>
-                    </div>
-                  ) : "Pending"}
-                </td>
-              </tr>
-            ))}
-          </tbody>
+  <tr className="border-b">
+    <th className="p-2">Company</th>
+    <th className="p-2">Email Draft (preview)</th>
+    <th className="p-2">Status</th>
+    <th className="p-2">Health (SPF/DMARC)</th>
+  </tr>
+</thead>
+<tbody>
+  {leads.map((lead) => (
+    <tr key={lead.id} className="border-b ">
+      <td className="p-2 font-medium">{lead.companyName}</td>
+      <td className="p-2 text-sm text-gray-600">
+        {lead.emailDraft ? lead.emailDraft.slice(0, 100) + "…" : "—"}
+      </td>
+      <td className="p-2 text-sm">{lead.status}</td>
+      <td className="p-2">
+        {lead.deliverability && typeof lead.deliverability === 'object' ? (
+          <div className="flex gap-2">
+            <span className={(lead.deliverability as any).hasSPF ? "text-green-600" : "text-red-600"}>SPF</span>
+            <span className={(lead.deliverability as any).hasDMARC ? "text-green-600" : "text-red-600"}>DMARC</span>
+          </div>
+        ) : "Pending"}
+      </td>
+    </tr>
+  ))}
+</tbody>
         </table>
       </div>
     </main>

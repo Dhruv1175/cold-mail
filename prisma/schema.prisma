@@ -19,7 +19,7 @@ model Lead {
   id               String @id @default(cuid())
   createdAt        DateTime @default(now()) 
   companyName      String 
-  website          String
+  website          String @unique 
   prospectName     String
   title            String
   signal           String
