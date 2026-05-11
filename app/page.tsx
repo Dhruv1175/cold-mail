@@ -3,7 +3,15 @@ import {prisma} from "@/lib/prisma";
 import { Lead } from "@/types";
 
 export default async function Home() {
-  const leads = await prisma.lead.findMany({orderBy:{createdAt:'desc'}});
+  const leads = await prisma.lead.findMany({
+  orderBy: { createdAt: 'desc' },
+  include: {
+    evaluations: {
+      orderBy: { createdAt: 'desc' },
+      take: 1,  // only the most recent evaluation
+    },
+  },
+});
   return (
     <main className="p-8 max-w-4xl mx-auto">
       <h1 className="text-2xl font-bold mb-6">Lead Discovery Engine</h1>
@@ -29,6 +37,7 @@ export default async function Home() {
     <th className="p-2">Email Draft (preview)</th>
     <th className="p-2">Status</th>
     <th className="p-2">Health (SPF/DMARC)</th>
+    <th className="p-2">Quality Score</th>
   </tr>
 </thead>
 <tbody>
@@ -47,6 +56,13 @@ export default async function Home() {
           </div>
         ) : "Pending"}
       </td>
+      <td className="p-2">
+  {lead.evaluations && lead.evaluations.length > 0 ? (
+    <span className={lead.evaluations[0].score >= 70 ? "text-green-600" : "text-red-600"}>
+      {lead.evaluations[0].score}
+    </span>
+  ) : "—"}
+</td>
     </tr>
   ))}
 </tbody>

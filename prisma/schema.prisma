@@ -26,4 +26,16 @@ model Lead {
   emailDraft       String?
   status           LeadStatus @default(DISCOVERED)
   deliverability   Json?
+  evaluations   Evaluation[] 
+}
+
+model Evaluation {
+  id               String @id @default(cuid())
+  leadId           String
+  lead             Lead @relation(fields:[leadId],references:[id])
+  score            Int
+  criteria         Json 
+  feedback         String
+  createdAt        DateTime @default(now()) 
+
 }

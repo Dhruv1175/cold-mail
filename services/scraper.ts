@@ -2,6 +2,7 @@ import puppeteer from "puppeteer";
 import { prisma } from "@/lib/prisma";
 import { checkDomainHealth } from "@/lib/dns-check";
 import { generateEmailDraft } from "@/services/ai-generator";
+import { evaluateEmailDraft } from "@/services/email-evaluator";
 import { cleanDomain } from "@/lib/utils";
 
 export async function scrapeYCombinator(): Promise<void> {
@@ -84,31 +85,43 @@ export async function scrapeYCombinator(): Promise<void> {
         title,
       });
 
-      await prisma.lead.upsert({
-        where: { website: domain },
-        update: {
-          companyName: company.name,
-          prospectName,
-          title,
-          signal: company.signal,
-          emailDraft,
-          deliverability,
-          status: 'DISCOVERED',
-        },
-        create: {
-          companyName: company.name,
-          website: domain,
-          prospectName,
-          title,
-          signal: company.signal,
-          emailDraft,
-          deliverability,
-          status: 'DISCOVERED',
-        },
-      });
+      const lead = await prisma.lead.upsert({
+  where: { website: domain },
+  update: {
+    companyName: company.name,
+    prospectName,
+    title,
+    signal: company.signal,
+    emailDraft,
+    deliverability,
+    status: 'DISCOVERED',
+  },
+  create: {
+    companyName: company.name,
+    website: domain,
+    prospectName,
+    title,
+    signal: company.signal,
+    emailDraft,
+    deliverability,
+    status: 'DISCOVERED',
+  },
+});
 
+const evaluation = await evaluateEmailDraft(emailDraft, company.signal);
+await prisma.evaluation.create({
+  data: {
+    leadId: lead.id,
+    score: evaluation.score,
+    criteria: evaluation.criteria,
+    feedback: evaluation.feedback,
+  },
+});
 
-      await new Promise(resolve => setTimeout(resolve, 1500));
+insertedCount++;   // <-- increment counter
+console.log(`✅ Upserted: ${company.name} (${domain})`);
+
+await new Promise(resolve => setTimeout(resolve, 1500));
     }
 
     console.log(`\n[SCRAPER] Finished. Inserted/updated ${insertedCount} leads.`);
