@@ -21,6 +21,7 @@ model Lead {
   companyName      String 
   website          String @unique 
   prospectName     String
+  prospectEmail    String?
   title            String
   signal           String
   emailDraft       String?
@@ -39,3 +40,4 @@ model Evaluation {
   createdAt        DateTime @default(now()) 
 
 }
+

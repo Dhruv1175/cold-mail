@@ -26,7 +26,8 @@ export async function scrapeYCombinator(): Promise<void> {
         return { name, signal, href };
       });
     });
-
+    let previousCount = await prisma.lead.count();
+    let newLeadsCount = 0;
     let insertedCount = 0;
     for (const company of companies) {
       if (!company.name || !company.href) continue;
@@ -107,7 +108,8 @@ export async function scrapeYCombinator(): Promise<void> {
     status: 'DISCOVERED',
   },
 });
-
+const existingLead = await prisma.lead.findUnique({ where: { website: domain } });
+if (!existingLead) newLeadsCount++;
 const evaluation = await evaluateEmailDraft(emailDraft, company.signal);
 await prisma.evaluation.create({
   data: {
@@ -123,7 +125,29 @@ console.log(`✅ Upserted: ${company.name} (${domain})`);
 
 await new Promise(resolve => setTimeout(resolve, 1500));
     }
+    const totalLeads = await prisma.lead.count();
+    const baseUrl = process.env.NEXTAUTH_URL || 'http://localhost:3000';
+    const response =  await fetch(`${baseUrl}/api/notify`, {
 
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body:JSON.stringify({
+        event:'scrape.completed',
+        data:{
+          newLeads: newLeadsCount,
+          totalLeads
+        },
+        recipient:'ashserena1947@gmail.com'
+      })
+    })
+
+    if(!response.ok){
+      console.error('Notification failed:', await response.text());
+} else {
+  console.log('Notification sent successfully');
+}
     console.log(`\n[SCRAPER] Finished. Inserted/updated ${insertedCount} leads.`);
   } catch (error) {
     console.error('[SCRAPER] Fatal error:', error);

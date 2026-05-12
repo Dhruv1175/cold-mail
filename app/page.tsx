@@ -1,6 +1,7 @@
 import {createLead} from "@/app/actions/lead";
 import {prisma} from "@/lib/prisma";
 import { Lead } from "@/types";
+import { sendEmailAction } from "@/services/send-email";
 
 export default async function Home() {
   const leads = await prisma.lead.findMany({
@@ -21,6 +22,7 @@ export default async function Home() {
         <input name="companyName" placeholder="Company Name" className="p-2 border rounded" required />
         <input name="website" placeholder="website.com" className="p-2 border rounded" required />
         <input name="prospectName" placeholder="Prospect Name" className="p-2 border rounded" required />
+        <input name="prospectEmail" placeholder="Prospect Email (e.g., elon@tesla.com)" className="p-2 border rounded" required />
         <input name="title" placeholder="Job Title (e.g. CEO)" className="p-2 border rounded" required />
         <textarea name="signal" placeholder="Why are we reaching out?" className="p-2 border rounded col-span-2" required />
         <button type="submit" className="bg-blue-600 text-white p-2 rounded col-span-2 hover:bg-blue-700">
@@ -38,6 +40,7 @@ export default async function Home() {
     <th className="p-2">Status</th>
     <th className="p-2">Health (SPF/DMARC)</th>
     <th className="p-2">Quality Score</th>
+    <th className="p-2">Actions</th>
   </tr>
 </thead>
 <tbody>
@@ -62,6 +65,14 @@ export default async function Home() {
       {lead.evaluations[0].score}
     </span>
   ) : "—"}
+</td>
+<td className="p-2">
+  <form action={sendEmailAction}>
+    <input type="hidden" name="leadId" value={lead.id} />
+    <button type="submit" className="bg-green-600 text-white px-2 py-1 rounded text-sm">
+      Send Email
+    </button>
+  </form>
 </td>
     </tr>
   ))}

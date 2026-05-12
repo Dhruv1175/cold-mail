@@ -18,6 +18,7 @@ export async function createLead(formData: FormData) {
   }
 
   // Extract all fields first
+  const prospectEmail = formData.get("prospectEmail") as string;
   const prospectName = formData.get("prospectName") as string;
   const companyName = formData.get("companyName") as string;
   const signal = formData.get("signal") as string;
@@ -40,6 +41,7 @@ export async function createLead(formData: FormData) {
       status: "DISCOVERED",
       deliverability: health,
       emailDraft,
+      prospectEmail
     },
   });
 
