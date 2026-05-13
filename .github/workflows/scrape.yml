@@ -2,9 +2,8 @@ name: Automated Lead Scraping
 
 on:
   schedule:
-    # Runs every 6 hours
     - cron: '0 */6 * * *'
-  workflow_dispatch:   # Allows manual trigger from GitHub UI
+  workflow_dispatch:
 
 jobs:
   scrape:
@@ -22,7 +21,13 @@ jobs:
       - name: Install system dependencies (for Puppeteer)
         run: |
           sudo apt-get update
-          sudo apt-get install -y libgbm-dev libasound2
+          sudo apt-get install -y \
+            libgbm1 \
+            libasound2t64 \
+            libxshmfence1 \
+            libnss3 \
+            libatk-bridge2.0-0 \
+            libgtk-3-0
 
       - name: Install dependencies
         run: npm ci
