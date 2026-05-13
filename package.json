@@ -6,6 +6,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
+    "scrape":"tsx scripts/run-scraper.ts",
     "lint": "eslint"
   },
   "dependencies": {
