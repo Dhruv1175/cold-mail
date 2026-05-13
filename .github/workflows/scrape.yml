@@ -25,9 +25,26 @@ jobs:
       - name: Install Playwright browsers
         run: npx playwright install chromium
 
-      - name: Run scraper
-        run: npx tsx scripts/run-scraper.ts
-        env:
-          DATABASE_URL: ${{ secrets.DATABASE_URL }}
-          DIRECT_URL: ${{ secrets.DIRECT_URL }}
-          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+- name: Generate Prisma Client
+  run: npx prisma generate
+  env:
+    DATABASE_URL: ${{ secrets.DATABASE_URL }}
+    DIRECT_URL: ${{ secrets.DIRECT_URL }}
+
+
+- name: Run scraper
+  run: |
+    set -e
+    echo "=== Environment ==="
+    node --version
+    npm --version
+    echo "=== Check tsconfig ==="
+    cat tsconfig.json | head -20
+    echo "=== Run scraper with trace ==="
+    npx tsx --trace-warnings scripts/run-scraper.ts
+  env:
+    DATABASE_URL: ${{ secrets.DATABASE_URL }}
+    DIRECT_URL: ${{ secrets.DIRECT_URL }}
+    GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+    # Optional: enable Puppeteer debugging
+    DEBUG: puppeteer:*
