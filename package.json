@@ -6,7 +6,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "scrape":"tsx scripts/run-scraper.ts",
+    "scrape": "tsx scripts/run-scraper.ts",
     "lint": "eslint"
   },
   "dependencies": {
@@ -31,6 +31,7 @@
     "eslint-config-next": "16.2.6",
     "prisma": "^7.8.0",
     "tailwindcss": "^4",
+    "tsx": "^4.21.0",
     "typescript": "^5"
   }
 }
